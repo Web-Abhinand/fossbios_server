@@ -9,6 +9,16 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
+    },
+    rollno: {
+        type: String,
+    },
+    role: {
+        type: String,
+    },
+    approved: {
+        type: Boolean,
+        default: false
     }
 });
 
