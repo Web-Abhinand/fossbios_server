@@ -24,7 +24,6 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  
   try {
     const user = await userModal.findOne({ email: email });
 
@@ -54,7 +53,6 @@ app.post('/login', async (req, res) => {
 });
   
 
-// Define the logout route
 app.post('/logout', (req, res) => {
   const token = req.header('x-auth-token');
   console.log(token);
@@ -86,10 +84,8 @@ app.get('/userEmails', async (req, res) => {
 
 app.put('/approveUser/:email', async (req, res) => {
   const { email } = req.params;
-  console.log(email);
 
   try {
-    // Find the user by ID and update the 'approved' field to true
     const user = await userModal.findOneAndUpdate({ email }, { approved: true }, { new: true });
 
     if (!user) {
@@ -107,8 +103,7 @@ app.put('/approveUser/:email', async (req, res) => {
 app.get('/allUsersDetails', async (req, res) => {
   try {
     // Query the database to retrieve all user details
-    const users = await userModal.find(); // This assumes your user model is named "userModal"
-
+    const users = await userModal.find(); 
     // Send the list of users as a JSON response
     res.json(users);
   } catch (error) {
@@ -117,8 +112,41 @@ app.get('/allUsersDetails', async (req, res) => {
   }
 });
 
-const port = 5000;
-app.listen(port, () => {
-    console.log(`Server is running on port: ${port}`);
-}
+
+app.get('/getUserRole/:email', async (req, res) => {
+  const { email } = req.params;
+  try {
+    // Query the database to retrieve the user's role based on their email
+    const user = await userModal.findOne({ email }, 'role'); 
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ role: user.role });
+  } catch (error) {
+    console.error('Error fetching user role:', error);
+    res.status(500).json({ message: 'Error fetching user role' });
+  }
+});
+
+
+app.get('/currentUserDetails/:email', async (req, res) => {
+  const { email } = req.params;
+  try {
+    // Query the database to retrieve the user's details based on their email
+    const user = await userModal.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ message: 'Error fetching user details' });
+  }
+});
+
+  const port = 5000;
+  app.listen(port, () => {
+      console.log(`Server is running on port: ${port}`);
+  }
 );
