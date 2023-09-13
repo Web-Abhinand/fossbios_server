@@ -145,6 +145,40 @@ app.get('/currentUserDetails/:email', async (req, res) => {
   }
 });
 
+app.post('/leave-request', async (req, res) => {
+  try {
+    const { email, reason, leaveDates } = req.body;
+    console.log(req.body);
+    console.log(email);
+    // Update the user document to set leaveRequest to true
+    const user = await userModal.findOneAndUpdate(
+      { email: email }, // Assuming email is unique
+      {
+        $push: {
+          leaveRequests: {
+            date: leaveDates, // Add the date of the leave request
+            reason: reason, // Add the reason for the leave request
+            leaveApproved: false, // Set the leaveApproved field (if needed)
+          },
+        },
+        $set: {
+          leaveRequest: true, // Set leaveRequest to true
+        },
+      },
+      { new: true } // Return the updated document
+    );
+    console.log(user,'user');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'Leave request submitted', user });
+  } catch (error) {
+    console.error('Error submitting leave request:', error);
+    res.status(500).json({ message: 'Error submitting leave request' });
+    res.send(error);
+  }
+});
+
   const port = 5000;
   app.listen(port, () => {
       console.log(`Server is running on port: ${port}`);
