@@ -179,6 +179,24 @@ app.post('/leave-request', async (req, res) => {
   }
 });
 
+app.get('/currentUserLeaveRequests/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    console.log(email,'email for leave request details');
+    const user = await userModal.findOne({ email });
+    console.log(user,'user for leave request details');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const leaveRequests = user.leaveRequests;
+    console.log(leaveRequests,'leaveRequests');
+    res.status(200).json(leaveRequests);
+  } catch (error) {
+    console.error('Error fetching user leave requests:', error);
+    res.status(500).json({ message: 'Error fetching user leave requests' });
+  }
+});
+
   const port = 5000;
   app.listen(port, () => {
       console.log(`Server is running on port: ${port}`);
